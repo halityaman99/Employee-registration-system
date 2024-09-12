@@ -1,0 +1,87 @@
+﻿@model odevproject.Models.ÖdevTable
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Kullanıcı Düzenle";
+}
+
+<form class="form-group" method="post">
+    <div>
+        <label>Kullanıcı Adı</label>
+        @Html.TextBoxFor(m => m.KullaniciAdi, new { @class = "form-control" })
+    </div>
+    <div>
+        <label>Kullanıcı Soyadı</label>
+        @Html.TextBoxFor(m => m.KullaniciSoyadi, new { @class = "form-control" })
+    </div>
+    <div>
+        <label>Kullanıcı Telefon Numarası</label>
+        @Html.TextBoxFor(m => m.TelefonNumarasi, new { @class = "form-control" })
+    </div>
+    <div>
+        <label>Kullanıcı Mail</label>
+        @Html.TextBoxFor(m => m.Mail, new { @class = "form-control" })
+    </div>
+    <div>
+        <label>Kullanıcı Yetki</label>
+        @Html.TextBoxFor(m => m.Yetki, new { @class = "form-control" })
+    </div>
+    <div>
+        <label>Kullanıcı Yaş</label>
+        @Html.TextBoxFor(m => m.Yas, new { @class = "form-control" })
+    </div>
+    <div>
+        <label>İl</label>
+        @Html.DropDownList("IlId", (SelectList)ViewBag.Iller, "İl Seçiniz", new { @class = "form-control", id = "ilDropdown" })
+    </div>
+    <div>
+        <label>İlçe</label>
+        @Html.DropDownList("IlceId", (SelectList)ViewBag.Ilceler, "İlçe Seçiniz", new { @class = "form-control", id = "ilceDropdown" })
+    </div>
+    <button class="btn btn-info">Kullanıcı Güncelle</button>
+</form>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // İl değiştiğinde ilçeleri güncelle
+            $('#ilDropdown').change(function () {
+                var ilId = $(this).val();
+                if (ilId) {
+                    $.ajax({
+                        url: '@Url.Action("GetIlceler")',
+                        type: 'GET',
+                        data: { ilId: ilId },
+                        success: function (data) {
+                            var $ilceDropdown = $('#ilceDropdown');
+                            $ilceDropdown.empty(); // Mevcut ilçeleri temizle
+                            $.each(data, function (index, ilce) {
+                                $ilceDropdown.append('<option value="' + ilce.ilceId + '">' + ilce.ilceAd + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#ilceDropdown').empty(); // İl seçilmediğinde ilçeleri temizle
+                }
+            });
+
+            // Sayfa yüklendiğinde seçili il için ilçeleri güncelle
+            var selectedIl = $('#ilDropdown').val();
+            if (selectedIl) {
+                $.ajax({
+                    url: '@Url.Action("GetIlceler")',
+                    type: 'GET',
+                    data: { ilId: selectedIl },
+                    success: function (data) {
+                        var $ilceDropdown = $('#ilceDropdown');
+                        $ilceDropdown.empty(); // Mevcut ilçeleri temizle
+                        $.each(data, function (index, ilce) {
+                            $ilceDropdown.append('<option value="' + ilce.ilceId + '">' + ilce.ilceAd + '</option>');
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+}
